@@ -1,56 +1,68 @@
-# Templates
+# 🎨 Design Token Manager
 
-Project templates and scaffolding tools
+Part of **BlackRoad Studio** — production creative tools.
 
-## 🌌 About BlackRoad OS, Inc.
+Manage, version, validate, diff, and export design tokens. SQLite persistence with CSS / JavaScript / Tailwind exports.
 
-**Core Product:** API layer above Google, OpenAI, and Anthropic
-**Purpose:** Manage AI model memory and continuity
-**Goal:** Enable entire companies to operate exclusively by AI
+## Features
 
-## 📦 Features
+- **Token CRUD** — add, update, get, delete, list with category filtering
+- **Validation** — per-category rules (color format, spacing units, naming)
+- **CSS export** — `--prefix-name: value;` with RGB channels and alias vars
+- **JS export** — ES module with named exports + grouped `tokens` object
+- **Tailwind config** — drop-in `module.exports` for all categories
+- **Versioned snapshots** — save point-in-time state to SQLite
+- **Diff engine** — compare any two snapshots or snapshot vs. current DB
+- **Bulk import** — W3C Design Token Format or flat JSON
+- **34 seed tokens** — BlackRoad brand colors, 8pt spacing, type scale, shadows, radii
+- **Zero dependencies** — stdlib only
 
-- ✨ Project templates and scaffolding tools
-- 🚀 Enterprise-ready infrastructure
-- 🔒 Proprietary BlackRoad OS, Inc. technology
-- 🌐 Designed for massive scale (30k agents + 30k employees)
+## Quick start
 
-## 🏗️ Infrastructure
+```bash
+# Seed with BlackRoad defaults (34 tokens)
+python src/design_token_manager.py seed
 
-This repository is part of the BlackRoad Empire:
-- **578 repositories** across 15 specialized organizations
-- Designed to support **30,000 AI agents + 30,000 human employees**
-- **1 operator:** Alexa Amundson (CEO)
+# Add a custom token
+python src/design_token_manager.py add color/brand/blue '#3b82f6' color --desc 'Blue 500'
 
-## 📊 Status
+# Export as CSS
+python src/design_token_manager.py export-css --prefix '--ds'
 
-🟢 **Active Development** | 🏢 **BlackRoad OS, Inc.** | 👔 **CEO: Alexa Amundson**
+# Export as Tailwind
+python src/design_token_manager.py export-tailwind
 
----
+# Export as ES module
+python src/design_token_manager.py export-js
 
-## 📜 License & Copyright
+# Save a snapshot
+python src/design_token_manager.py snapshot --version v1.0.0 --name 'Release'
 
-**Copyright © 2026 BlackRoad OS, Inc. All Rights Reserved.**
+# Diff snapshot against current
+python src/design_token_manager.py diff <snapshot-id> current
 
-**CEO:** Alexa Amundson
+# Validate all tokens
+python src/design_token_manager.py validate
+```
 
-**PROPRIETARY AND CONFIDENTIAL**
+## Token categories
 
-This software is the proprietary property of BlackRoad OS, Inc. and is **NOT for commercial resale**.
+| Category | Validation | Example |
+|---|---|---|
+| `color` | hex / rgb / hsl / var() | `#FF1D6C` |
+| `spacing` | px / rem / em / % | `16px` |
+| `typography` | rem / em | `1rem` |
+| `radius` | px / rem | `8px` |
+| `shadow` | CSS shadow syntax | `0 4px 6px rgba(0,0,0,0.1)` |
+| `opacity` | 0–1 | `0.5` |
+| `z-index` | integer | `100` |
+| `breakpoint` | px width | `768px` |
+| `motion` | ms duration | `300ms` |
+| `border` | border shorthand | `1px solid var(--br-border)` |
 
-### ⚠️ Usage Restrictions:
-- ✅ **Permitted:** Testing, evaluation, and educational purposes
-- ❌ **Prohibited:** Commercial use, resale, or redistribution without written permission
+## Tests
 
-### 🏢 Enterprise Scale:
-Designed to support:
-- 30,000 AI Agents
-- 30,000 Human Employees
-- One Operator: Alexa Amundson (CEO)
-
-### 📧 Contact:
-For commercial licensing inquiries:
-- **Email:** blackroad.systems@gmail.com
-- **Organization:** BlackRoad OS, Inc.
-
-See [LICENSE](LICENSE) for complete terms.
+```bash
+pip install pytest pytest-cov
+pytest tests/ -v --cov=src
+```
