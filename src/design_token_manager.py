@@ -123,7 +123,7 @@ def _count_categories(tokens: List[Token]) -> Dict[str, int]:
 
 
 def _now() -> str:
-    return datetime.datetime.utcnow().isoformat()
+    return datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 
 # ── Token CRUD ────────────────────────────────────────────────────────────────
@@ -382,7 +382,7 @@ def export_tailwind_config(db_path: Path = DB_PATH) -> str:
 
     tw: Dict[str, dict] = {
         "colors": {}, "spacing": {}, "fontSize": {},
-        "borderRadius": {}, "boxShadow": {}, "opacity": {},
+        "borderRadius": {}, "borderWidth": {}, "boxShadow": {}, "opacity": {},
         "zIndex": {}, "screens": {}, "transitionDuration": {},
     }
 
@@ -396,6 +396,7 @@ def export_tailwind_config(db_path: Path = DB_PATH) -> str:
         "z-index":    ("zIndex",             lambda t: t.value),
         "breakpoint": ("screens",            lambda t: t.value),
         "motion":     ("transitionDuration", lambda t: t.value),
+        "border":     ("borderWidth",        lambda t: t.value),
     }
 
     for t in tokens:
@@ -431,7 +432,7 @@ def export_json_snapshot(
     db_path: Path = DB_PATH,
 ) -> str:
     tokens  = list_tokens(db_path=db_path)
-    version = version or datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")
+    version = version or datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d%H%M%S")
     ts = TokenSet(
         version=version, name=name, tokens=tokens,
         created_at=_now(), description=description,
@@ -653,6 +654,11 @@ examples:
 
     sub.add_parser("export-tailwind", help="Export as Tailwind config")
 
+    p_json = sub.add_parser("export-json", help="Export snapshot as JSON")
+    p_json.add_argument("--version",     default="")
+    p_json.add_argument("--name",        default="snapshot")
+    p_json.add_argument("--description", default="")
+
     p_snap = sub.add_parser("snapshot", help="Save a versioned snapshot")
     p_snap.add_argument("--version",     default="")
     p_snap.add_argument("--name",        default="snapshot")
@@ -724,6 +730,9 @@ examples:
 
     elif args.cmd == "export-tailwind":
         print(export_tailwind_config())
+
+    elif args.cmd == "export-json":
+        print(export_json_snapshot(args.version, args.name, args.description))
 
     elif args.cmd == "snapshot":
         sid = save_snapshot(args.version, args.name, args.description)
